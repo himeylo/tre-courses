@@ -69,6 +69,34 @@ function tre_courses_upcoming_sort_key($start, $end, $today) {
   return tre_courses_date_to_timestamp($sort_date);
 }
 
+function tre_courses_next_start_date($start, $end, $occurrences, $today) {
+  $next = '';
+  $start = tre_courses_normalize_date($start);
+  $end   = tre_courses_normalize_date($end ?: $start);
+
+  if ($end && $end >= $today) {
+    $candidate = $start ?: $end;
+    if ($candidate && ($next === '' || $candidate < $next)) {
+      $next = $candidate;
+    }
+  }
+
+  if (!empty($occurrences)) {
+    foreach ($occurrences as $occ) {
+      $os = tre_courses_normalize_date($occ['start']);
+      $oe = tre_courses_normalize_date($occ['end'] ?: $os);
+      if ($oe && $oe >= $today) {
+        $candidate = $os ?: $oe;
+        if ($candidate && ($next === '' || $candidate < $next)) {
+          $next = $candidate;
+        }
+      }
+    }
+  }
+
+  return $next;
+}
+
 // Register the ACF block.
 add_action('acf/init', function () {
   if (!function_exists('acf_register_block_type')) return;
@@ -218,21 +246,40 @@ function tre_courses_render_courses_list_block($block, $content = '', $is_previe
       );
     }
 
-    echo '<article class="tre-course">';
-      echo '<header class="tre-course__header">';
-        echo '<div class="tre-course__title">';
-          if ($course['url']) {
-            echo '<a class="tre-course__link" href="' . esc_url($course['url']) . '" target="_blank" rel="noopener noreferrer">' . esc_html($course['title']) . '</a>';
-          } else {
-            echo esc_html($course['title']);
-          }
-        echo '</div>';
-        if ($thumb) {
-          echo '<div class="tre-course__thumb-wrap">' . $thumb . '</div>';
-        }
-      echo '</header>';
+    $badge_month = '';
+    $badge_day = '';
+    $badge_date = tre_courses_next_start_date($course['start'], $course['end'], $course['occurrences'], $today);
+    if ($badge_date) {
+      try {
+        $badge_dt = new DateTime($badge_date);
+        $badge_month = strtoupper($badge_dt->format('M'));
+        $badge_day = $badge_dt->format('j');
+      } catch (Exception $ex) {
+        $badge_month = '';
+        $badge_day = '';
+      }
+    }
 
-      echo '<div class="tre-course__meta">';
+    echo '<article class="tre-course">';
+      if ($badge_month && $badge_day) {
+        echo '<div class="tre-course__badge" aria-hidden="true">';
+          echo '<span class="tre-course__badge-month">' . esc_html($badge_month) . '</span>';
+          echo '<span class="tre-course__badge-day">' . esc_html($badge_day) . '</span>';
+        echo '</div>';
+      }
+      echo '<div class="tre-course__card">';
+        echo '<div class="tre-course__content">';
+          echo '<header class="tre-course__header">';
+            echo '<div class="tre-course__title">';
+              if ($course['url']) {
+                echo '<a class="tre-course__link" href="' . esc_url($course['url']) . '" target="_blank" rel="noopener noreferrer">' . esc_html($course['title']) . '</a>';
+              } else {
+                echo esc_html($course['title']);
+              }
+            echo '</div>';
+          echo '</header>';
+
+          echo '<div class="tre-course__meta">';
 
         // $primary_range = tre_courses_format_date_range($course['start'], $course['end']);
         // if ($primary_range) {
@@ -277,12 +324,18 @@ function tre_courses_render_courses_list_block($block, $content = '', $is_previe
           echo '<div class="tre-course__cost"><strong>Cost:</strong> ' . esc_html($course['cost']) . '</div>';
         }
 
+          echo '</div>';
+
+          if ($course['url']) {
+            echo '<div class="tre-course__cta"><a class="tre-course__button" href="' . esc_url($course['url']) . '" target="_blank" rel="noopener noreferrer">' . esc_html($cta_label) . '</a></div>';
+          }
+        echo '</div>';
+
+        if ($thumb) {
+          echo '<div class="tre-course__thumb-wrap">' . $thumb . '</div>';
+        }
+
       echo '</div>';
-
-      if ($course['url']) {
-        echo '<div class="tre-course__cta"><a class="tre-course__button" href="' . esc_url($course['url']) . '" target="_blank" rel="noopener noreferrer">' . esc_html($cta_label) . '</a></div>';
-      }
-
     echo '</article>';
   }
 
