@@ -6,12 +6,14 @@ Taxonomy: course_category
 Terms (slugs): instructor-certification, certified-instructor-courses, rider-licensing, licensed-rider-courses
 
 ACF Fields on course:
-- start_date (date)
-- end_date (date)
-- city, state, venue, organizer, cost, external_url
+- organizer, external_url
 - occurrences (repeater):
   - occ_start_date (date)
   - occ_end_date (date)
+  - occ_venue
+  - occ_city
+  - occ_state
+  - occ_cost
 
 ACF Block: TRE Courses List
 Block fields:
@@ -23,10 +25,11 @@ Block fields:
 - cta_text (text)
 
 Rules:
-- A course is "upcoming" if primary end_date >= today OR any occurrence end_date >= today.
-- Sorting: by earliest upcoming start date across primary range and occurrences.
-- Hide past occurrences in the "Other dates" list.
+- A course is "upcoming" if any occurrence end_date >= today.
+- Sorting: by earliest upcoming occurrence start date.
+- Hide past occurrences in the dates list.
 - Date display: "March 3–5, 2026" (full month name), cross-month/year handled.
+- Locations are per occurrence; display City, State and include a "(map)" link to the full address.
 - Do not hardcode colors; inherit theme.
 
 ## Codex implementation rules (must follow)

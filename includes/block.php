@@ -69,27 +69,16 @@ function tre_courses_upcoming_sort_key($start, $end, $today) {
   return tre_courses_date_to_timestamp($sort_date);
 }
 
-function tre_courses_next_start_date($start, $end, $occurrences, $today) {
+function tre_courses_next_start_date_from_occurrences($occurrences, $today) {
   $next = '';
-  $start = tre_courses_normalize_date($start);
-  $end   = tre_courses_normalize_date($end ?: $start);
 
-  if ($end && $end >= $today) {
-    $candidate = $start ?: $end;
-    if ($candidate && ($next === '' || $candidate < $next)) {
-      $next = $candidate;
-    }
-  }
-
-  if (!empty($occurrences)) {
-    foreach ($occurrences as $occ) {
-      $os = tre_courses_normalize_date($occ['start']);
-      $oe = tre_courses_normalize_date($occ['end'] ?: $os);
-      if ($oe && $oe >= $today) {
-        $candidate = $os ?: $oe;
-        if ($candidate && ($next === '' || $candidate < $next)) {
-          $next = $candidate;
-        }
+  foreach ($occurrences as $occ) {
+    $os = tre_courses_normalize_date($occ['start']);
+    $oe = tre_courses_normalize_date($occ['end'] ?: $os);
+    if ($oe && $oe >= $today) {
+      $candidate = $os ?: $oe;
+      if ($candidate && ($next === '' || $candidate < $next)) {
+        $next = $candidate;
       }
     }
   }
@@ -157,12 +146,6 @@ function tre_courses_render_courses_list_block($block, $content = '', $is_previe
     $q->the_post();
     $post_id = get_the_ID();
 
-    $start = (string) get_field('start_date', $post_id);
-    $end   = (string) get_field('end_date', $post_id);
-
-    $primary_sort = tre_courses_upcoming_sort_key($start, $end, $today);
-    $primary_upcoming = ($primary_sort !== null);
-
     $occurrences = [];
     $occurrence_sorts = [];
 
@@ -171,40 +154,46 @@ function tre_courses_render_courses_list_block($block, $content = '', $is_previe
         the_row();
         $os = (string) get_sub_field('occ_start_date');
         $oe = (string) get_sub_field('occ_end_date');
+        $ov = (string) get_sub_field('occ_venue');
+        $ocs = (string) get_sub_field('occ_city_state');
+        $oa = (string) get_sub_field('occ_address');
+        $ocost = (string) get_sub_field('occ_cost');
         $sort_key = tre_courses_upcoming_sort_key($os, $oe, $today);
         if ($sort_key !== null) {
           $occurrences[] = [
             'start' => $os,
             'end'   => $oe,
+            'venue' => $ov,
+            'city_state' => $ocs,
+            'address' => $oa,
+            'cost'  => $ocost,
+            'sort_key' => $sort_key,
           ];
           $occurrence_sorts[] = $sort_key;
         }
       }
     }
 
-    if (!$primary_upcoming && empty($occurrence_sorts)) {
+    if (empty($occurrence_sorts)) {
       continue;
     }
 
-    $sort_candidates = [];
-    if ($primary_sort !== null) $sort_candidates[] = $primary_sort;
-    if (!empty($occurrence_sorts)) $sort_candidates = array_merge($sort_candidates, $occurrence_sorts);
+    usort($occurrences, function ($a, $b) {
+      if ($a['sort_key'] === $b['sort_key']) {
+        return strcasecmp((string) $a['start'], (string) $b['start']);
+      }
+      return $a['sort_key'] <=> $b['sort_key'];
+    });
 
     $external_url = (string) get_field('external_url', $post_id);
     $course_url = $external_url ?: get_permalink($post_id);
 
     $courses[] = [
-      'sort_key' => min($sort_candidates),
+      'sort_key' => min($occurrence_sorts),
       'id'       => $post_id,
       'title'    => get_the_title(),
       'url'      => $course_url,
-      'start'    => $start,
-      'end'      => $end,
-      'city'     => (string) get_field('city', $post_id),
-      'state'    => (string) get_field('state', $post_id),
-      'venue'    => (string) get_field('venue', $post_id),
       'org'      => (string) get_field('organizer', $post_id),
-      'cost'     => (string) get_field('cost', $post_id),
       'occurrences' => $occurrences,
     ];
   }
@@ -229,13 +218,6 @@ function tre_courses_render_courses_list_block($block, $content = '', $is_previe
   echo '<div class="tre-courses-list" data-category="' . esc_attr($term_slug) . '">';
 
   foreach ($courses as $course) {
-    $location_parts = array_filter([
-      $course['venue'],
-      trim($course['city'] . (($course['city'] && $course['state']) ? ', ' : '') . $course['state']),
-    ]);
-    $location_query = implode(', ', $location_parts);
-    $location_label = trim($course['city'] . (($course['city'] && $course['state']) ? ', ' : '') . $course['state']);
-    $location_url = $location_query ? 'https://www.google.com/maps/search/?api=1&query=' . rawurlencode($location_query) : '';
     $thumb = '';
     if ($show_featured_image && has_post_thumbnail($course['id'])) {
       $thumb = get_the_post_thumbnail(
@@ -250,7 +232,7 @@ function tre_courses_render_courses_list_block($block, $content = '', $is_previe
 
     $badge_month = '';
     $badge_day = '';
-    $badge_date = tre_courses_next_start_date($course['start'], $course['end'], $course['occurrences'], $today);
+    $badge_date = tre_courses_next_start_date_from_occurrences($course['occurrences'], $today);
     if ($badge_date) {
       try {
         $badge_dt = new DateTime($badge_date);
@@ -283,53 +265,51 @@ function tre_courses_render_courses_list_block($block, $content = '', $is_previe
 
           echo '<div class="tre-course__meta">';
 
-        // $primary_range = tre_courses_format_date_range($course['start'], $course['end']);
-        // if ($primary_range) {
-          echo '<div class="tre-course__dates"><strong>Dates:</strong></div>';
-        // }
-
-        $items = [];
-        $seen_keys = [];
-        if (tre_courses_upcoming_sort_key($course['start'], $course['end'], $today) !== null) {
-          $primary_item = tre_courses_format_date_range($course['start'], $course['end']);
-          $primary_key = tre_courses_normalize_date($course['start']) . '|' . tre_courses_normalize_date($course['end']);
-          if ($primary_item && !isset($seen_keys[$primary_key])) {
-            $items[] = $primary_item;
-            $seen_keys[$primary_key] = true;
-          }
-        }
         if (!empty($course['occurrences'])) {
+          $seen_keys = [];
+          echo '<div class="tre-course__occurrences"><strong>Dates:</strong><ul>';
           foreach ($course['occurrences'] as $occ) {
             $r = tre_courses_format_date_range($occ['start'], $occ['end']);
-            $occ_key = tre_courses_normalize_date($occ['start']) . '|' . tre_courses_normalize_date($occ['end']);
-            if ($r && !isset($seen_keys[$occ_key])) {
-              $items[] = $r;
-              $seen_keys[$occ_key] = true;
+            if (!$r) continue;
+
+            $occ_key = implode('|', [
+              tre_courses_normalize_date($occ['start']),
+              tre_courses_normalize_date($occ['end']),
+              (string) $occ['city_state'],
+              (string) $occ['address'],
+              (string) $occ['venue'],
+              (string) $occ['cost'],
+            ]);
+            if (isset($seen_keys[$occ_key])) continue;
+            $seen_keys[$occ_key] = true;
+
+            $location_label = trim((string) $occ['city_state']);
+            $map_parts = array_filter([
+              $show_venue ? $occ['venue'] : '',
+              $occ['address'],
+              $location_label,
+            ]);
+            $location_query = implode(', ', $map_parts);
+            $location_url = $location_query ? 'https://www.google.com/maps/search/?api=1&query=' . rawurlencode($location_query) : '';
+
+            $line = esc_html($r);
+            if ($location_label) {
+              $line .= ' — ' . esc_html($location_label);
+              if ($location_url) {
+                $line .= ' <span class="tre-course__map">(<a href="' . esc_url($location_url) . '" target="_blank" rel="noopener noreferrer">map</a>)</span>';
+              }
             }
-          }
-        }
-        if (!empty($items)) {
-          echo '<div class="tre-course__occurrences"><ul>';
-          foreach ($items as $r) {
-            echo '<li>' . esc_html($r) . '</li>';
+            if ($show_cost && $occ['cost'] !== '') {
+              $line .= ' — ' . esc_html($occ['cost']);
+            }
+
+            echo '<li>' . $line . '</li>';
           }
           echo '</ul></div>';
-        }
-
-        if ($location_label) {
-          echo '<div class="tre-course__location"><strong>Location:</strong> ' . esc_html($location_label);
-          if ($location_url) {
-            echo ' <span class="tre-course__map">(<a href="' . esc_url($location_url) . '" target="_blank" rel="noopener noreferrer">map</a>)</span>';
-          }
-          echo '</div>';
         }
         if ($show_organizer && $course['org']) {
           echo '<div class="tre-course__org"><strong>Host:</strong> ' . esc_html($course['org']) . '</div>';
         }
-        if ($show_cost && $course['cost'] !== '') {
-          echo '<div class="tre-course__cost"><strong>Cost:</strong> ' . esc_html($course['cost']) . '</div>';
-        }
-
           echo '</div>';
 
           if ($course['url']) {
