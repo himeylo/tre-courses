@@ -155,6 +155,37 @@ add_action('acf/init', function () {
         'ui' => 1,
         'default_value' => 1,
       ],
+      [
+        'key' => 'field_tre_block_show_venue',
+        'label' => 'Show venue',
+        'name' => 'show_venue',
+        'type' => 'true_false',
+        'ui' => 1,
+        'default_value' => 1,
+      ],
+      [
+        'key' => 'field_tre_block_show_organizer',
+        'label' => 'Show organizer',
+        'name' => 'show_organizer',
+        'type' => 'true_false',
+        'ui' => 1,
+        'default_value' => 1,
+      ],
+      [
+        'key' => 'field_tre_block_cta_text',
+        'label' => 'CTA button text',
+        'name' => 'cta_text',
+        'type' => 'text',
+        'instructions' => 'Optional. Defaults to "Details / Register".',
+      ],
+      [
+        'key' => 'field_tre_block_show_featured_image',
+        'label' => 'Show featured image',
+        'name' => 'show_featured_image',
+        'type' => 'true_false',
+        'ui' => 1,
+        'default_value' => 0,
+      ],
     ],
     'location' => [
       [

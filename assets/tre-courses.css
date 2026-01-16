@@ -1,5 +1,8 @@
-.tre-course { padding: 16px; border: 1px solid #e5e5e5; border-radius: 12px; margin: 12px 0; }
+.tre-course { padding: 16px; border: 1px solid currentColor; border-radius: 12px; margin: 12px 0; }
+.tre-course__header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 .tre-course__title { font-size: 1.05rem; margin-bottom: 6px; }
+.tre-course__thumb-wrap { flex: 0 0 auto; margin-left: 12px; max-width: 40%; }
+.tre-course__thumb { display: block; max-height: 200px; width: auto; height: auto; }
 .tre-course__link { text-decoration: none; }
 .tre-course__meta > div { margin: 4px 0; }
 .tre-course__occurrences ul { margin: 6px 0 0 18px; }

@@ -26,7 +26,7 @@ function tre_courses_register_cpt() {
     'public'             => true,
     'show_in_rest'       => true,
     'menu_icon'          => 'dashicons-welcome-learn-more',
-    'supports'           => ['title', 'editor', 'excerpt', 'revisions'],
+    'supports'           => ['title', 'editor', 'excerpt', 'revisions', 'thumbnail'],
     'has_archive'        => true,
     'rewrite'            => ['slug' => 'courses'],
     'show_in_nav_menus'  => true,
