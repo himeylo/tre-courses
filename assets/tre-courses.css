@@ -2,15 +2,18 @@
 .tre-course__badge { width: 64px; height: 64px; border-radius: 999px; background: var(--global-palette8, #f5f5f5); color: var(--global-palette4, currentColor); border: 1px solid var(--global-palette7, rgba(0, 0, 0, 0.1)); display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1; font-weight: 700; }
 .tre-course__badge-month { font-size: 0.65rem; letter-spacing: 0.12em; }
 .tre-course__badge-day { font-size: 1.4rem; margin-top: 4px; }
-.tre-course__card { padding: 18px 20px; border: 1px solid var(--global-palette7, rgba(0, 0, 0, 0.1)); border-radius: 14px; background: #fff; display: flex; align-items: flex-start; gap: 18px; box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08); }
+.tre-course__card { padding: 18px 20px; border: 1px solid var(--global-palette7, rgba(0, 0, 0, 0.1)); border-radius: 14px; background: #fff; display: flex; align-items: flex-start; gap: 16px; box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08); }
 .tre-course__content { flex: 1; min-width: 0; }
 .tre-course__header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: nowrap; }
 .tre-course__title { font-size: 1.1rem; margin-bottom: 6px; font-weight: 700; color: var(--global-palette4, currentColor); }
-.tre-course__thumb-wrap { flex: 0 0 auto; max-width: 40%; }
-.tre-course__thumb { display: block; max-height: 200px; width: auto; height: auto; border-radius: 10px; box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12); }
+.tre-course__thumb-wrap { flex: 0 0 auto; width: 120px; }
+.tre-course__thumb { display: block; width: 120px; height: 80px; object-fit: cover; border-radius: 10px; box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12); }
 .tre-course__link { text-decoration: none; color: inherit; }
 .tre-course__meta > div { margin: 6px 0; color: var(--global-palette5, currentColor); }
+.tre-course__occurrences ul { margin: 6px 0 0 18px; color: var(--global-palette5, currentColor); }
 .tre-course__occurrences ul { margin: 6px 0 0 18px; }
+.tre-course__map { font-size: 0.9em; color: var(--global-palette6, currentColor); }
+.tre-course__map a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
 .tre-course__cta { margin-top: 8px; }
 .tre-course__button { display:inline-block; padding: 10px 18px; border-radius: 999px; border: 1px solid var(--global-palette1, currentColor); background: var(--global-palette1, currentColor); color: var(--global-palette9, #fff); text-decoration:none; font-weight: 700; }
 .tre-courses-empty { padding: 12px; opacity: .75; }
@@ -19,5 +22,6 @@
   .tre-course { grid-template-columns: 1fr; }
   .tre-course__badge { width: 52px; height: 52px; }
   .tre-course__card { padding: 16px 16px; flex-direction: column; }
-  .tre-course__thumb-wrap { max-width: 100%; }
+  .tre-course__thumb-wrap { width: 100%; }
+  .tre-course__thumb { width: 100%; height: auto; }
 }

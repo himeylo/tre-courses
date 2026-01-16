@@ -230,10 +230,12 @@ function tre_courses_render_courses_list_block($block, $content = '', $is_previe
 
   foreach ($courses as $course) {
     $location_parts = array_filter([
-      $show_venue ? $course['venue'] : '',
+      $course['venue'],
       trim($course['city'] . (($course['city'] && $course['state']) ? ', ' : '') . $course['state']),
     ]);
-    $location = implode(' — ', $location_parts);
+    $location_query = implode(', ', $location_parts);
+    $location_label = trim($course['city'] . (($course['city'] && $course['state']) ? ', ' : '') . $course['state']);
+    $location_url = $location_query ? 'https://www.google.com/maps/search/?api=1&query=' . rawurlencode($location_query) : '';
     $thumb = '';
     if ($show_featured_image && has_post_thumbnail($course['id'])) {
       $thumb = get_the_post_thumbnail(
@@ -314,8 +316,12 @@ function tre_courses_render_courses_list_block($block, $content = '', $is_previe
           echo '</ul></div>';
         }
 
-        if ($location) {
-          echo '<div class="tre-course__location"><strong>Location:</strong> ' . esc_html($location) . '</div>';
+        if ($location_label) {
+          echo '<div class="tre-course__location"><strong>Location:</strong> ' . esc_html($location_label);
+          if ($location_url) {
+            echo ' <span class="tre-course__map">(<a href="' . esc_url($location_url) . '" target="_blank" rel="noopener noreferrer">map</a>)</span>';
+          }
+          echo '</div>';
         }
         if ($show_organizer && $course['org']) {
           echo '<div class="tre-course__org"><strong>Host:</strong> ' . esc_html($course['org']) . '</div>';
