@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: TRE Courses (ACF Block + CPT)
- * Description: Adds a Courses custom post type with course categories, ACF Pro fields (including occurrences repeater), and an ACF block to display upcoming course lists by category with external links.
+ * Description: Adds a Courses custom post type with a course type taxonomy, ACF Pro fields, and an ACF block to display upcoming course lists by category with external links.
  * Version: 1.0.0
  * Author: TRE
  * Requires at least: 6.0
@@ -15,7 +15,7 @@ define('TRE_COURSES_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('TRE_COURSES_PLUGIN_URL', plugin_dir_url(__FILE__));
 
 define('TRE_COURSES_CPT', 'course');
-define('TRE_COURSES_TAX', 'course_category');
+define('TRE_COURSES_TAX', 'course_type');
 
 require_once TRE_COURSES_PLUGIN_DIR . 'includes/cpt-tax.php';
 require_once TRE_COURSES_PLUGIN_DIR . 'includes/acf-groups.php';

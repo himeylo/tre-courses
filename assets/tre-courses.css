@@ -10,8 +10,6 @@
 .tre-course__thumb { display: block; width: 120px; height: 80px; object-fit: cover; border-radius: 10px; box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12); }
 .tre-course__link { text-decoration: none; color: inherit; }
 .tre-course__meta > div { margin: 6px 0; color: var(--global-palette5, currentColor); }
-.tre-course__occurrences ul { margin: 6px 0 0 18px; color: var(--global-palette5, currentColor); }
-.tre-course__occurrences ul { margin: 6px 0 0 18px; }
 .tre-course__map { font-size: 0.9em; color: var(--global-palette6, currentColor); }
 .tre-course__map a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
 .tre-course__cta { margin-top: 8px; }

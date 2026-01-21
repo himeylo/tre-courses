@@ -27,6 +27,7 @@ function tre_courses_register_cpt() {
     'show_in_rest'       => true,
     'menu_icon'          => 'dashicons-welcome-learn-more',
     'supports'           => ['title', 'editor', 'excerpt', 'revisions', 'thumbnail'],
+    'taxonomies'         => ['category'],
     'has_archive'        => true,
     'rewrite'            => ['slug' => 'courses'],
     'show_in_nav_menus'  => true,
@@ -39,18 +40,18 @@ function tre_courses_register_cpt() {
 add_action('init', 'tre_courses_register_cpt');
 
 /**
- * Register Course Categories taxonomy.
+ * Register Course Type taxonomy.
  */
 function tre_courses_register_tax() {
   $labels = [
-    'name'          => 'Course Categories',
-    'singular_name' => 'Course Category',
-    'search_items'  => 'Search Course Categories',
-    'all_items'     => 'All Course Categories',
-    'edit_item'     => 'Edit Course Category',
-    'update_item'   => 'Update Course Category',
-    'add_new_item'  => 'Add New Course Category',
-    'menu_name'     => 'Course Categories',
+    'name'          => 'Course Types',
+    'singular_name' => 'Course Type',
+    'search_items'  => 'Search Course Types',
+    'all_items'     => 'All Course Types',
+    'edit_item'     => 'Edit Course Type',
+    'update_item'   => 'Update Course Type',
+    'add_new_item'  => 'Add New Course Type',
+    'menu_name'     => 'Course Types',
   ];
 
   $args = [
@@ -58,7 +59,7 @@ function tre_courses_register_tax() {
     'public'            => true,
     'show_in_rest'      => true,
     'hierarchical'      => true,
-    'rewrite'           => ['slug' => 'course-category'],
+    'rewrite'           => ['slug' => 'course-type'],
     'show_admin_column' => true,
   ];
 
@@ -66,22 +67,3 @@ function tre_courses_register_tax() {
 }
 
 add_action('init', 'tre_courses_register_tax');
-
-/**
- * Ensure the four requested default terms exist.
- */
-function tre_courses_ensure_default_terms() {
-  $terms = [
-    'instructor-certification'      => 'Instructor Certification',
-    'certified-instructor-courses'  => 'Certified Instructor Courses',
-    'rider-licensing'               => 'Rider Licensing',
-    'licensed-rider-courses'        => 'Licensed Rider Courses',
-  ];
-
-  foreach ($terms as $slug => $name) {
-    if (!term_exists($slug, TRE_COURSES_TAX)) {
-      wp_insert_term($name, TRE_COURSES_TAX, ['slug' => $slug]);
-    }
-  }
-}
-add_action('init', 'tre_courses_ensure_default_terms', 20);
