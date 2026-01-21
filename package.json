@@ -1,0 +1,21 @@
+{
+  "name": "tre-courses-block",
+  "version": "1.0.0",
+  "description": "Goal: display upcoming courses using an ACF block (Gutenberg). CPT: course Taxonomy: course_type (course name) Grouping: built-in post categories",
+  "main": "index.js",
+  "scripts": {
+    "build:css": "sass assets/scss:assets --no-source-map && postcss assets/tre-courses.css -u autoprefixer -o assets/tre-courses.css",
+    "watch:css": "sass --watch assets/scss:assets --no-source-map",
+    "build": "npm run build:css",
+    "watch": "npm run watch:css"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "autoprefixer": "^10.4.23",
+    "postcss": "^8.5.6",
+    "postcss-cli": "^11.0.1",
+    "sass": "^1.97.2"
+  }
+}

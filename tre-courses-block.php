@@ -42,3 +42,14 @@ add_action('enqueue_block_assets', function () {
   // Load on both editor + frontend (cheap CSS, safe).
   wp_enqueue_style('tre-courses');
 });
+
+add_filter('template_include', function ($template) {
+  if (is_tax(TRE_COURSES_TAX)) {
+    $plugin_template = TRE_COURSES_PLUGIN_DIR . 'templates/taxonomy-course_type.php';
+    if (file_exists($plugin_template)) {
+      return $plugin_template;
+    }
+  }
+
+  return $template;
+});
