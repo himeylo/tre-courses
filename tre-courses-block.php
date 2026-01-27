@@ -19,7 +19,9 @@ define('TRE_COURSES_TAX', 'course_type');
 
 require_once TRE_COURSES_PLUGIN_DIR . 'includes/cpt-tax.php';
 require_once TRE_COURSES_PLUGIN_DIR . 'includes/acf-groups.php';
+require_once TRE_COURSES_PLUGIN_DIR . 'includes/template-helpers.php';
 require_once TRE_COURSES_PLUGIN_DIR . 'includes/block.php';
+require_once TRE_COURSES_PLUGIN_DIR . 'includes/customizer.php';
 
 // Activation: register CPT/tax then flush rewrites.
 register_activation_hook(__FILE__, function () {
@@ -52,7 +54,7 @@ add_filter('template_include', function ($template) {
   }
 
   return $template;
-}, 99);
+}, 999);
 
 add_filter('taxonomy_template', function ($template) {
   if (is_tax(TRE_COURSES_TAX)) {
@@ -63,4 +65,15 @@ add_filter('taxonomy_template', function ($template) {
   }
 
   return $template;
-}, 99);
+}, 999);
+
+add_filter('single_template', function ($template) {
+  if (is_singular(TRE_COURSES_CPT)) {
+    $plugin_template = TRE_COURSES_PLUGIN_DIR . 'templates/single-course.php';
+    if (file_exists($plugin_template)) {
+      return $plugin_template;
+    }
+  }
+
+  return $template;
+}, 999);

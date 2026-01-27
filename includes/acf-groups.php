@@ -71,6 +71,13 @@ add_action('acf/init', function () {
         'type' => 'text',
       ],
       [
+        'key' => 'field_tre_organizer_link',
+        'label' => 'Host / Organizer Link',
+        'name' => 'organizer_link',
+        'type' => 'url',
+        'instructions' => 'Optional link to the organizer website.',
+      ],
+      [
         'key' => 'field_tre_external_url',
         'label' => 'External URL',
         'name' => 'external_url',
